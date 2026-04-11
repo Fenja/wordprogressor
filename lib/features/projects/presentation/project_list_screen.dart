@@ -6,6 +6,8 @@ import '../domain/project_model.dart';
 import '../providers/project_providers.dart';
 import '../presentation/widgets/deadline_badge.dart';
 import '../presentation/widgets/project_progress_bar.dart';
+import '../presentation/project_search_delegate.dart';
+import '../../achievements/providers/achievement_providers.dart';
 
 class ProjectListScreen extends ConsumerWidget {
   const ProjectListScreen({super.key});
@@ -14,17 +16,39 @@ class ProjectListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(filteredProjectsProvider);
     final filter = ref.watch(projectFilterProvider);
+    final streakAsync = ref.watch(currentStreakProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('WordProgressor'),
         actions: [
+          // Streak badge
+          streakAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (streak) => streak >= 2
+                ? Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: Chip(
+                      avatar: const Text('🔥',
+                          style: TextStyle(fontSize: 12)),
+                      label: Text(
+                        '$streak',
+                        style: const TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.w600),
+                      ),
+                      // FIXME tooltip: '$streak Tage Schreibstreak',
+                    ),
+                  )
+                : const SizedBox.shrink(),
+          ),
           IconButton(
             icon: const Icon(Icons.search_rounded),
             tooltip: 'Projekte suchen',
-            onPressed: () {
-              // TODO: search delegate
-            },
+            onPressed: () => showSearch(
+              context: context,
+              delegate: ProjectSearchDelegate(ref),
+            ),
           ),
         ],
         bottom: PreferredSize(
@@ -82,7 +106,7 @@ class _FilterChips extends ConsumerWidget {
               label: Text(f.$2),
               selected: selected,
               onSelected: (_) =>
-              ref.read(projectFilterProvider.notifier).state = f.$1,
+                  ref.read(projectFilterProvider.notifier).state = f.$1,
               showCheckmark: false,
             ),
           );
@@ -103,7 +127,7 @@ class _ProjectCard extends ConsumerWidget {
 
     return Semantics(
       label:
-      '${project.title}, ${project.genre}, ${(project.progressPercent * 100).toStringAsFixed(0)} Prozent abgeschlossen',
+          '${project.title}, ${project.genre}, ${(project.progressPercent * 100).toStringAsFixed(0)} Prozent abgeschlossen',
       button: true,
       child: Card(
         child: InkWell(
@@ -144,7 +168,7 @@ class _ProjectCard extends ConsumerWidget {
                   value: project.progressPercent,
                   height: 5,
                   semanticLabel:
-                  '${(project.progressPercent * 100).round()}% fertig',
+                      '${(project.progressPercent * 100).round()}% fertig',
                 ),
                 const SizedBox(height: 6),
                 Row(

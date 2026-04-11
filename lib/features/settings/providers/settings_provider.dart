@@ -49,6 +49,6 @@ final isLoggedInProvider = StateProvider<bool>((ref) => false);
 // ── Shared Preferences ────────────────────────────────────────────────────
 
 final sharedPreferencesProvider =
-FutureProvider<SharedPreferences>((ref) async {
+    FutureProvider<SharedPreferences>((ref) async {
   return SharedPreferences.getInstance();
 });

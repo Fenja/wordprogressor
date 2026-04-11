@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../projects/domain/project_model.dart';
 import '../../projects/providers/project_providers.dart';
+import '../../achievements/data/achievement_service.dart';
+import '../../achievements/domain/achievement_model.dart';
 
 class StatsScreen extends ConsumerWidget {
   const StatsScreen({super.key});
@@ -39,6 +42,12 @@ class StatsScreen extends ConsumerWidget {
               error: (_, __) => const SizedBox.shrink(),
               data: (projects) => _ProgressOverview(projects: projects),
             ),
+
+            const SizedBox(height: 24),
+
+            _AchievementTeaser(),
+
+            const SizedBox(height: 40),
           ],
         ),
       ),
@@ -57,9 +66,9 @@ class _SummaryGrid extends StatelessWidget {
       ('Aktiv', stats.activeProjects.toString(), Icons.edit_outlined),
       ('Eingereicht', stats.completedProjects.toString(), Icons.check_circle_outline),
       (
-      'Wörter gesamt',
-      _fmtWords(stats.totalWords),
-      Icons.article_outlined
+        'Wörter gesamt',
+        _fmtWords(stats.totalWords),
+        Icons.article_outlined
       ),
     ];
 
@@ -71,10 +80,10 @@ class _SummaryGrid extends StatelessWidget {
       crossAxisSpacing: 12,
       childAspectRatio: 1.8,
       children: items.map((item) => _StatCard(
-        label: item.$1,
-        value: item.$2,
-        icon: item.$3,
-      )).toList(),
+            label: item.$1,
+            value: item.$2,
+            icon: item.$3,
+          )).toList(),
     );
   }
 
@@ -153,10 +162,10 @@ class _GenreBreakdown extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ...sorted.map((entry) => _GenreRow(
-          genre: entry.key,
-          count: entry.value,
-          total: projects.length,
-        )),
+              genre: entry.key,
+              count: entry.value,
+              total: projects.length,
+            )),
       ],
     );
   }
@@ -197,7 +206,7 @@ class _GenreRow extends StatelessWidget {
                 value: fraction,
                 minHeight: 6,
                 backgroundColor:
-                theme.colorScheme.surfaceContainerHighest,
+                    theme.colorScheme.surfaceContainerHighest,
               ),
             ),
           ),
@@ -222,8 +231,8 @@ class _ProgressOverview extends StatelessWidget {
     final theme = Theme.of(context);
     final active = projects
         .where((p) =>
-    p.status == ProjectStatus.active ||
-        p.status == ProjectStatus.draft)
+            p.status == ProjectStatus.active ||
+            p.status == ProjectStatus.draft)
         .toList()
       ..sort((a, b) => b.progressPercent.compareTo(a.progressPercent));
 
@@ -280,13 +289,112 @@ class _ProgressRow extends StatelessWidget {
               value: project.progressPercent,
               minHeight: 5,
               backgroundColor:
-              theme.colorScheme.surfaceContainerHighest,
+                  theme.colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(
                   theme.colorScheme.primary),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+// ── Achievement Teaser ────────────────────────────────────────────────────────
+
+class _AchievementTeaser extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final unlockedAsync = ref.watch(unlockedAchievementsProvider);
+
+    return unlockedAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (_, __) => const SizedBox.shrink(),
+      data: (unlocked) {
+        final total = kAllAchievements.length;
+        final pct = total > 0 ? unlocked.length / total : 0.0;
+        final recent = (List<UnlockedAchievement>.from(unlocked)
+              ..sort((a, b) => b.unlockedAt.compareTo(a.unlockedAt)))
+            .take(3)
+            .toList();
+
+        return GestureDetector(
+          onTap: () => context.push('/achievements'),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surfaceContainerHighest
+                  .withOpacity(0.4),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withOpacity(0.4),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.emoji_events_outlined,
+                        size: 16, color: theme.colorScheme.primary),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Achievements',
+                      style: theme.textTheme.titleSmall
+                          ?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${unlocked.length} / $total',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 16,
+                        color: theme.colorScheme.onSurfaceVariant),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: LinearProgressIndicator(
+                    value: pct,
+                    minHeight: 5,
+                    backgroundColor:
+                        theme.colorScheme.surfaceContainerHighest,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        theme.colorScheme.primary),
+                  ),
+                ),
+                if (recent.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    'Zuletzt freigeschaltet',
+                    style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: recent
+                        .map((u) => Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Tooltip(
+                                message: u.def.title,
+                                child: Text(u.def.emoji,
+                                    style:
+                                        const TextStyle(fontSize: 22)),
+                              ),
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import '../domain/project_model.dart';
 import '../providers/project_providers.dart';
 import '../data/project_repository.dart';
-import '../../projects/presentation/widgets/deadline_badge.dart';
+import '../presentation/widgets/deadline_badge.dart';
 import '../presentation/widgets/project_progress_bar.dart';
 import '../presentation/widgets/log_session_sheet.dart';
 
@@ -91,7 +91,7 @@ class _ProjectDetailView extends ConsumerWidget {
             if (project.tags.isNotEmpty) ...[
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: _TagsSection(tags: project.tags),
               ),
               const Divider(),
@@ -101,7 +101,7 @@ class _ProjectDetailView extends ConsumerWidget {
             if (project.synopsis?.isNotEmpty == true) ...[
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: _TextSection(
                     label: 'Synopsis', text: project.synopsis!),
               ),
@@ -112,9 +112,9 @@ class _ProjectDetailView extends ConsumerWidget {
             if (project.notes?.isNotEmpty == true) ...[
               Padding(
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child:
-                _TextSection(label: 'Notizen', text: project.notes!),
+                    _TextSection(label: 'Notizen', text: project.notes!),
               ),
               const Divider(),
             ],
@@ -130,7 +130,7 @@ class _ProjectDetailView extends ConsumerWidget {
             // Danger zone
             Padding(
               padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: _DangerZone(project: project),
             ),
           ],
@@ -200,7 +200,7 @@ class _ProgressHero extends StatelessWidget {
           const SizedBox(height: 14),
           Semantics(
             label:
-            'Fortschritt: $pct Prozent, ${_fmt(project.wordCountCurrent)} von ${_fmt(project.wordCountGoal)} Wörtern',
+                'Fortschritt: $pct Prozent, ${_fmt(project.wordCountCurrent)} von ${_fmt(project.wordCountGoal)} Wörtern',
             child: ProjectProgressBar(
               value: project.progressPercent,
               height: 8,
@@ -302,11 +302,11 @@ class _TagsSection extends StatelessWidget {
           runSpacing: 6,
           children: tags
               .map((t) => Chip(
-            label: Text(t),
-            labelStyle: const TextStyle(fontSize: 12),
-            padding: EdgeInsets.zero,
-            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ))
+                    label: Text(t),
+                    labelStyle: const TextStyle(fontSize: 12),
+                    padding: EdgeInsets.zero,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ))
               .toList(),
         ),
       ],

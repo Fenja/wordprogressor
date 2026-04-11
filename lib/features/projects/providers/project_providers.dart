@@ -32,7 +32,7 @@ Future<ProjectStats> projectStats(ProjectStatsRef ref) async {
   final projects = await ref.watch(allProjectsProvider.future);
 
   final active = projects.where((p) =>
-  p.status == ProjectStatus.active || p.status == ProjectStatus.draft).length;
+      p.status == ProjectStatus.active || p.status == ProjectStatus.draft).length;
   final completed =
       projects.where((p) => p.status == ProjectStatus.submitted).length;
   final totalWords = projects.fold<int>(0, (s, p) => s + p.wordCountCurrent);
@@ -68,7 +68,7 @@ class ProjectStats {
 enum ProjectFilter { all, active, completed, paused }
 
 final projectFilterProvider =
-StateProvider<ProjectFilter>((ref) => ProjectFilter.all);
+    StateProvider<ProjectFilter>((ref) => ProjectFilter.all);
 
 final filteredProjectsProvider = Provider<AsyncValue<List<ProjectModel>>>((ref) {
   final filter = ref.watch(projectFilterProvider);
@@ -81,8 +81,8 @@ final filteredProjectsProvider = Provider<AsyncValue<List<ProjectModel>>>((ref) 
       case ProjectFilter.active:
         return list
             .where((p) =>
-        p.status == ProjectStatus.active ||
-            p.status == ProjectStatus.draft)
+                p.status == ProjectStatus.active ||
+                p.status == ProjectStatus.draft)
             .toList();
       case ProjectFilter.completed:
         return list

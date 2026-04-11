@@ -1,0 +1,111 @@
+{
+  "@@locale": "de",
+  "appTitle": "WordProgressor",
+  "@appTitle": { "description": "The app name" },
+
+  "navProjects": "Projekte",
+  "navDeadlines": "Deadlines",
+  "navStats": "Statistiken",
+  "navSettings": "Einstellungen",
+
+  "projectsEmpty": "Noch keine Projekte",
+  "projectsEmptyBody": "Erstelle dein erstes Schreibprojekt und behalte Fortschritt und Deadlines im Blick.",
+  "addProject": "Neues Projekt",
+  "editProject": "Projekt bearbeiten",
+  "deleteProject": "Projekt löschen",
+  "deleteProjectConfirmTitle": "Projekt löschen?",
+  "deleteProjectConfirmBody": "\"{title}\" wird dauerhaft gelöscht.",
+  "@deleteProjectConfirmBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+
+  "fieldTitle": "Titel",
+  "fieldGenre": "Genre",
+  "fieldStatus": "Status",
+  "fieldSynopsis": "Synopsis",
+  "fieldWordGoal": "Wortanzahl-Ziel",
+  "fieldChapters": "Kapitelanzahl (geplant)",
+  "fieldDeadline": "Deadline",
+  "fieldTags": "Tags",
+  "fieldNotes": "Notizen",
+  "fieldLanguage": "Sprache",
+  "fieldStartDate": "Begonnen am",
+  "fieldWords": "Wörter",
+  "fieldDurationMin": "Dauer (Min.)",
+
+  "statusDraft": "Entwurf",
+  "statusActive": "Aktiv",
+  "statusRevision": "Überarbeitung",
+  "statusSubmitted": "Eingereicht",
+  "statusAbandoned": "Pausiert",
+
+  "deadlineNone": "Keine Deadline",
+  "deadlineDaysRemaining": "{days} Tage",
+  "@deadlineDaysRemaining": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "deadlineOverdue": "Überfällig",
+
+  "milestoneEmpty": "Noch keine Meilensteine",
+  "milestoneEmptyBody": "Teile dein Projekt in überschaubare Schritte auf.",
+  "addMilestone": "Meilenstein hinzufügen",
+  "milestoneDueDate": "Fällig am",
+  "milestoneCompleted": "Erledigt",
+  "milestonePending": "Offen",
+
+  "logSession": "Schreibsitzung erfassen",
+  "logWordsWritten": "Geschriebene Wörter",
+  "logDuration": "Dauer",
+  "logSessionNote": "Notiz zur Sitzung",
+
+  "settingsAccount": "Konto",
+  "settingsSync": "Synchronisation",
+  "settingsAppearance": "Darstellung",
+  "settingsNotifications": "Benachrichtigungen",
+  "settingsAccessibility": "Barrierefreiheit",
+  "settingsAbout": "Über die App",
+  "settingsThemeLight": "Hell",
+  "settingsThemeDark": "Dunkel",
+  "settingsThemeSystem": "System",
+  "settingsSyncEnabled": "Firebase-Synchronisation",
+  "settingsSyncLast": "Zuletzt synchronisiert: {time}",
+  "@settingsSyncLast": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "settingsNotifDeadlines": "Deadline-Erinnerungen",
+  "settingsNotifDeadlinesSub": "Wird 3 Tage vor Ablauf erinnert",
+
+  "actionSave": "Speichern",
+  "actionCancel": "Abbrechen",
+  "actionDelete": "Löschen",
+  "actionEdit": "Bearbeiten",
+  "actionAdd": "Hinzufügen",
+  "actionSignIn": "Anmelden",
+  "actionSignOut": "Abmelden",
+  "actionRegister": "Konto erstellen",
+  "actionSyncNow": "Jetzt synchronisieren",
+
+  "errorRequired": "Dieses Feld ist erforderlich",
+  "errorInvalidEmail": "Bitte eine gültige E-Mail-Adresse eingeben",
+  "errorPasswordTooShort": "Mindestens 6 Zeichen",
+  "errorSaveFailed": "Fehler beim Speichern",
+
+  "progressPercent": "{percent}% abgeschlossen",
+  "@progressPercent": {
+    "placeholders": { "percent": { "type": "int" } }
+  },
+  "wordsOfGoal": "{current} / {goal} Wörter",
+  "@wordsOfGoal": {
+    "placeholders": {
+      "current": { "type": "String" },
+      "goal": { "type": "String" }
+    }
+  },
+  "chapterProgress": "Kapitel {done} von {total}",
+  "@chapterProgress": {
+    "placeholders": {
+      "done": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  }
+}

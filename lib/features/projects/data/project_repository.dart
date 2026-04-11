@@ -3,8 +3,12 @@ import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:wordprogressor/core/database/app_database.dart';
+import '../../../core/database/app_database.dart';
 import '../domain/project_model.dart';
+
+// Achievement integration — imported here to evaluate after session/project events.
+// The service is called directly (not via provider) so the repository stays testable.
+import '../../achievements/data/achievement_service.dart';
 
 const _uuid = Uuid();
 
@@ -18,13 +22,13 @@ class ProjectRepository {
   Stream<List<ProjectModel>> watchAllProjects() {
     return _db.watchAllProjects().map(
           (rows) => rows.map(_rowToModel).toList(),
-    );
+        );
   }
 
   Stream<List<ProjectModel>> watchActiveProjects() {
     return _db.watchActiveProjects().map(
           (rows) => rows.map(_rowToModel).toList(),
-    );
+        );
   }
 
   // ── CRUD ──────────────────────────────────────────────────────────────────
@@ -87,28 +91,43 @@ class ProjectRepository {
         colorHex: Value(model.colorHex),
       ),
     );
+
+    // If project was just submitted, evaluate project-completion achievements
+    if (model.status == ProjectStatus.submitted) {
+      final all = await _db.watchAllProjects().first;
+      final completedCount = all
+          .where((p) => p.status == ProjectStatus.submitted.name)
+          .length;
+      final achievementService = AchievementService(_db);
+      await achievementService.evaluateAfterProjectCompleted(
+        totalCompletedProjects: completedCount,
+      );
+      // Note: Toast is shown by the UI layer (ProjectFormScreen) by
+      // watching unlockedAchievementsProvider for changes.
+    }
   }
 
   Future<void> deleteProject(String id) async {
     await _db.deleteProject(id);
   }
 
-  /// Increment word count and add a writing session
-  Future<void> logSession({
+  /// Increment word count and add a writing session.
+  /// Returns a list of newly unlocked [AchievementDef]s (may be empty).
+  Future<List<dynamic>> logSession({
     required String projectId,
     required int wordsWritten,
     int durationMinutes = 0,
     String? notes,
   }) async {
     final project = await getProject(projectId);
-    if (project == null) return;
+    if (project == null) return [];
 
-    // Update project word count
+    // 1. Update project word count
     await updateProject(project.copyWith(
       wordCountCurrent: project.wordCountCurrent + wordsWritten,
     ));
 
-    // Store session
+    // 2. Store session
     final now = DateTime.now();
     await _db.insertSession(
       WritingSessionsCompanion.insert(
@@ -121,6 +140,32 @@ class ProjectRepository {
         createdAt: now,
       ),
     );
+
+    // 3. Evaluate achievements
+    // Calculate total words across ALL projects
+    final allProjects = await _db.watchAllProjects().first;
+    final totalWords =
+        allProjects.fold<int>(0, (s, p) => s + p.wordCountCurrent);
+
+    // Calculate current streak from all session dates
+    final allSessions = await _db.getSessionsInRange(
+      DateTime.now().subtract(const Duration(days: 400)),
+      DateTime.now(),
+    );
+    final streakDays = AchievementService.calculateStreak(
+      allSessions.map((s) => s.sessionDate).toList(),
+    );
+
+    final achievementService = AchievementService(_db);
+    final newlyUnlocked = await achievementService.evaluateAfterSession(
+      totalWordsAllProjects: totalWords,
+      currentStreakDays: streakDays,
+      sessionWords: wordsWritten,
+      sessionDurationMinutes: durationMinutes,
+      sessionTime: now,
+    );
+
+    return newlyUnlocked;
   }
 
   // ── Conversion ────────────────────────────────────────────────────────────
@@ -131,7 +176,7 @@ class ProjectRepository {
       title: row.title,
       genre: row.genre,
       status: ProjectStatus.values.firstWhere(
-            (s) => s.name == row.status,
+        (s) => s.name == row.status,
         orElse: () => ProjectStatus.draft,
       ),
       synopsis: row.synopsis,

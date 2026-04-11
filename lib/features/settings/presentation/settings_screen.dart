@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/services/sync_service.dart';
 import '../providers/settings_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -44,8 +46,8 @@ class SettingsScreen extends ConsumerWidget {
             value: syncEnabled && isLoggedIn,
             onChanged: isLoggedIn
                 ? (v) => ref
-                .read(syncEnabledProvider.notifier)
-                .state = v
+                    .read(syncEnabledProvider.notifier)
+                    .state = v
                 : null,
           ),
           ListTile(
@@ -102,7 +104,7 @@ class SettingsScreen extends ConsumerWidget {
             subtitle: const Text('Wird 3 Tage vor Ablauf erinnert'),
             value: notificationsEnabled,
             onChanged: (v) =>
-            ref.read(notificationsEnabledProvider.notifier).state = v,
+                ref.read(notificationsEnabledProvider.notifier).state = v,
           ),
 
           const Divider(),
@@ -114,6 +116,18 @@ class SettingsScreen extends ConsumerWidget {
             title: const Text('Systemeinstellungen verwenden'),
             subtitle: const Text(
                 'Schriftgröße und Kontrast folgen den Systemeinstellungen'),
+          ),
+
+          const Divider(),
+
+          // Achievements link
+          _SectionHeader(label: 'Achievements'),
+          ListTile(
+            leading: const Icon(Icons.emoji_events_outlined),
+            title: const Text('Meine Achievements'),
+            subtitle: const Text('Fortschritt und freigeschaltete Abzeichen'),
+            trailing: const Icon(Icons.chevron_right_rounded),
+            onTap: () => context.push('/achievements'),
           ),
 
           const Divider(),
@@ -149,38 +163,26 @@ class SettingsScreen extends ConsumerWidget {
   }
 
   void _showAuthDialog(BuildContext context, WidgetRef ref) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Konto erstellen oder anmelden'),
-        content: const Text(
-          'Mit einem Konto kannst du deine Projekte auf mehreren Geräten synchronisieren. Die App funktioniert auch vollständig ohne Konto.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Abbrechen'),
-          ),
-          FilledButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              // TODO: Launch Firebase Auth UI
-            },
-            child: const Text('Weiter'),
-          ),
-        ],
-      ),
-    );
+    context.push('/auth');
   }
 
-  void _triggerSync(BuildContext context, WidgetRef ref) {
-    ScaffoldMessenger.of(context).showSnackBar(
+  void _triggerSync(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.showSnackBar(
       const SnackBar(
         content: Text('Synchronisation gestartet…'),
         duration: Duration(seconds: 2),
       ),
     );
-    // TODO: call SyncService
+    final result = await ref.read(syncServiceProvider).sync();
+    if (context.mounted) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
   }
 }
 

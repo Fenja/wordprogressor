@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/project_repository.dart';
+import '../../../achievements/domain/achievement_model.dart';
+import '../../../achievements/presentation/widgets/achievement_toast.dart';
 
 class LogSessionSheet extends ConsumerStatefulWidget {
   final String projectId;
@@ -30,15 +32,28 @@ class _LogSessionSheetState extends ConsumerState<LogSessionSheet> {
 
     setState(() => _saving = true);
     try {
-      await ref.read(projectRepositoryProvider).logSession(
-        projectId: widget.projectId,
-        wordsWritten: words,
-        durationMinutes: int.tryParse(_durationCtrl.text) ?? 0,
-        notes: _notesCtrl.text.trim().isEmpty
-            ? null
-            : _notesCtrl.text.trim(),
-      );
-      if (mounted) Navigator.pop(context);
+      final newlyUnlocked = await ref.read(projectRepositoryProvider).logSession(
+            projectId: widget.projectId,
+            wordsWritten: words,
+            durationMinutes: int.tryParse(_durationCtrl.text) ?? 0,
+            notes: _notesCtrl.text.trim().isEmpty
+                ? null
+                : _notesCtrl.text.trim(),
+          );
+
+      if (mounted) {
+        Navigator.pop(context);
+        // Show achievement toasts after sheet closes
+        if (newlyUnlocked.isNotEmpty && context.mounted) {
+          // Stagger toasts 600ms apart so they don't overlap
+          for (var i = 0; i < newlyUnlocked.length; i++) {
+            final def = newlyUnlocked[i] as AchievementDef;
+            Future.delayed(Duration(milliseconds: 600 * i), () {
+              if (context.mounted) AchievementToast.show(context, def);
+            });
+          }
+        }
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -119,10 +134,10 @@ class _LogSessionSheetState extends ConsumerState<LogSessionSheet> {
                       onPressed: _saving ? null : _save,
                       icon: _saving
                           ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child:
-                          CircularProgressIndicator(strokeWidth: 2))
+                              width: 16,
+                              height: 16,
+                              child:
+                                  CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.check_rounded),
                       label: const Text('Speichern'),
                     ),

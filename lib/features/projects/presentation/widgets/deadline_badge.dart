@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'package:wordprogressor/core/theme/app_theme.dart';
 import '../../domain/project_model.dart';
+import '../../../../../core/theme/app_theme.dart';
 
 class DeadlineBadge extends StatelessWidget {
   final ProjectModel project;
@@ -54,21 +53,21 @@ class DeadlineBadge extends StatelessWidget {
     switch (status) {
       case DeadlineStatus.ok:
         return (
-        isDark ? AppColors.deadlineOkBgDark : AppColors.deadlineOkBg,
-        isDark ? AppColors.deadlineOkDark : AppColors.deadlineOk,
-        '${days} Tage',
+          isDark ? AppColors.deadlineOkBgDark : AppColors.deadlineOkBg,
+          isDark ? AppColors.deadlineOkDark : AppColors.deadlineOk,
+          '${days} Tage',
         );
       case DeadlineStatus.near:
         return (
-        isDark ? AppColors.deadlineNearBgDark : AppColors.deadlineNearBg,
-        isDark ? AppColors.deadlineNearDark : AppColors.deadlineNear,
-        '${days} Tage',
+          isDark ? AppColors.deadlineNearBgDark : AppColors.deadlineNearBg,
+          isDark ? AppColors.deadlineNearDark : AppColors.deadlineNear,
+          '${days} Tage',
         );
       case DeadlineStatus.overdue:
         return (
-        isDark ? AppColors.deadlineOverBgDark : AppColors.deadlineOverBg,
-        isDark ? AppColors.deadlineOverDark : AppColors.deadlineOver,
-        'Überfällig',
+          isDark ? AppColors.deadlineOverBgDark : AppColors.deadlineOverBg,
+          isDark ? AppColors.deadlineOverDark : AppColors.deadlineOver,
+          'Überfällig',
         );
       case DeadlineStatus.none:
         return (Colors.transparent, Colors.transparent, '');

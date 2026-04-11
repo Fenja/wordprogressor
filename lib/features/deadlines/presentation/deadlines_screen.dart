@@ -23,7 +23,7 @@ class DeadlinesScreen extends ConsumerWidget {
         data: (projects) {
           final withDeadline = projects
               .where((p) =>
-          p.deadline != null && p.status != ProjectStatus.submitted)
+                  p.deadline != null && p.status != ProjectStatus.submitted)
               .toList()
             ..sort((a, b) => a.deadline!.compareTo(b.deadline!));
 
@@ -32,9 +32,9 @@ class DeadlinesScreen extends ConsumerWidget {
           }
 
           final overdue =
-          withDeadline.where((p) => p.deadlineStatus == DeadlineStatus.overdue).toList();
+              withDeadline.where((p) => p.deadlineStatus == DeadlineStatus.overdue).toList();
           final upcoming =
-          withDeadline.where((p) => p.deadlineStatus != DeadlineStatus.overdue).toList();
+              withDeadline.where((p) => p.deadlineStatus != DeadlineStatus.overdue).toList();
 
           return ListView(
             padding: const EdgeInsets.only(bottom: 40, top: 8),
@@ -156,8 +156,8 @@ class _EmptyDeadlines extends StatelessWidget {
               'Setze in deinen Projekten Deadlines, um sie hier zu verfolgen.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
           ],
         ),

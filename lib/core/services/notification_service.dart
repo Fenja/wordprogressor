@@ -1,6 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 
+import 'notification_service_web.dart'
+    if (dart.library.io) 'notification_service_stub.dart' as web_notif;
+
+/// Platform-adaptive notification service.
+///
+/// - Android / iOS: flutter_local_notifications with exact scheduling.
+/// - Web: browser Notification API via dart:html.
+///   Note: browser notifications only fire while the tab is open.
+///   For background delivery, wire up the service worker (web/sw.js).
 class NotificationService {
   static const _channelId = 'wordprogressor_deadlines';
   static const _channelName = 'Deadline-Erinnerungen';
@@ -9,22 +19,31 @@ class NotificationService {
 
   static Future<void> initialize(
       FlutterLocalNotificationsPlugin plugin) async {
+    if (kIsWeb) {
+      await web_notif.requestWebPermission();
+      return;
+    }
     const androidSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
-    const settings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
+    await plugin.initialize(
+      const InitializationSettings(
+        android: androidSettings,
+        iOS: iosSettings,
+      ),
     );
-    await plugin.initialize(settings);
   }
 
   static Future<void> requestPermissions(
       FlutterLocalNotificationsPlugin plugin) async {
+    if (kIsWeb) {
+      await web_notif.requestWebPermission();
+      return;
+    }
     final ios = plugin.resolvePlatformSpecificImplementation<
         IOSFlutterLocalNotificationsPlugin>();
     await ios?.requestPermissions(alert: true, badge: true, sound: true);
@@ -34,7 +53,6 @@ class NotificationService {
     await android?.requestNotificationsPermission();
   }
 
-  /// Schedule a deadline reminder 3 days before the deadline.
   static Future<void> scheduleDeadlineReminder({
     required FlutterLocalNotificationsPlugin plugin,
     required int id,
@@ -44,6 +62,17 @@ class NotificationService {
     final reminderDate = deadline.subtract(const Duration(days: 3));
     if (reminderDate.isBefore(DateTime.now())) return;
 
+    if (kIsWeb) {
+      final delay = reminderDate.difference(DateTime.now());
+      Future.delayed(delay, () {
+        web_notif.showWebNotification(
+          title: '⏱ Deadline in 3 Tagen',
+          body: '"$projectTitle" ist in 3 Tagen fällig.',
+        );
+      });
+      return;
+    }
+
     const androidDetails = AndroidNotificationDetails(
       _channelId,
       _channelName,
@@ -51,10 +80,9 @@ class NotificationService {
       importance: Importance.high,
       priority: Priority.high,
     );
-    const iosDetails = DarwinNotificationDetails();
     const details = NotificationDetails(
       android: androidDetails,
-      iOS: iosDetails,
+      iOS: const DarwinNotificationDetails(),
     );
 
     await plugin.zonedSchedule(
@@ -65,19 +93,19 @@ class NotificationService {
       details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
+          UILocalNotificationDateInterpretation.absoluteTime,
     );
   }
 
-  /// Cancel all notifications for a project.
   static Future<void> cancelForProject(
       FlutterLocalNotificationsPlugin plugin, int id) async {
+    if (kIsWeb) return;
     await plugin.cancel(id);
   }
 
-  /// Cancel all scheduled notifications.
   static Future<void> cancelAll(
       FlutterLocalNotificationsPlugin plugin) async {
+    if (kIsWeb) return;
     await plugin.cancelAll();
   }
 }

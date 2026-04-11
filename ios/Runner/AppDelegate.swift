@@ -12,5 +12,12 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+
+    // Request notification permissions on first launch
+        UNUserNotificationCenter.current().requestAuthorization(
+          options: [.alert, .badge, .sound]
+        ) { granted, _ in
+          print("Notification permission granted: \(granted)")
+        }
   }
 }

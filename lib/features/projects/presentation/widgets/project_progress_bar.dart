@@ -34,7 +34,7 @@ class ProjectProgressBar extends StatelessWidget {
           value: value,
           minHeight: height,
           backgroundColor:
-          Theme.of(context).colorScheme.surfaceContainerHighest,
+              Theme.of(context).colorScheme.surfaceContainerHighest,
           valueColor: AlwaysStoppedAnimation<Color>(color),
         ),
       ),

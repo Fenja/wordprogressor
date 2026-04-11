@@ -4,7 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' show Value;
 
-import '../../../../../../core/database/app_database.dart';
+import '../../../core/database/app_database.dart';
 
 const _uuid = Uuid();
 
@@ -105,7 +105,7 @@ class _MilestoneRow extends StatelessWidget {
 
     return Semantics(
       label:
-      '${milestone.title}, ${milestone.isCompleted ? 'erledigt' : 'offen'}, fällig am ${fmt.format(milestone.dueDate)}',
+          '${milestone.title}, ${milestone.isCompleted ? 'erledigt' : 'offen'}, fällig am ${fmt.format(milestone.dueDate)}',
       child: ListTile(
         leading: GestureDetector(
           onTap: onToggle,
@@ -122,8 +122,8 @@ class _MilestoneRow extends StatelessWidget {
                 color: milestone.isCompleted
                     ? Colors.green.shade600
                     : isOverdue
-                    ? theme.colorScheme.error
-                    : theme.colorScheme.outline,
+                        ? theme.colorScheme.error
+                        : theme.colorScheme.outline,
                 width: 2,
               ),
             ),
@@ -136,7 +136,7 @@ class _MilestoneRow extends StatelessWidget {
           milestone.title,
           style: TextStyle(
             decoration:
-            milestone.isCompleted ? TextDecoration.lineThrough : null,
+                milestone.isCompleted ? TextDecoration.lineThrough : null,
             color: milestone.isCompleted
                 ? theme.colorScheme.onSurfaceVariant
                 : null,
@@ -296,9 +296,9 @@ class _EmptyMilestones extends StatelessWidget {
               'Teile dein Projekt in überschaubare Schritte auf.',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color:
-                Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+                    color:
+                        Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(

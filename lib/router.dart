@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:wordprogressor/features/achievements/presentation/achievements_screen.dart';
 
 import '../features/deadlines/presentation/deadlines_screen.dart';
 import '../features/milestones/presentation/milestones_screen.dart';
@@ -67,6 +68,12 @@ GoRouter router(RouterRef ref) {
             path: '/settings',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: SettingsScreen(),
+            ),
+          ),
+          GoRoute(
+            path: '/achievements',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: AchievementsScreen(),
             ),
           ),
         ],

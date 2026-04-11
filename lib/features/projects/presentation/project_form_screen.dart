@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 
 import '../domain/project_model.dart';
 import '../data/project_repository.dart';
+import '../providers/project_providers.dart';
 
 const _uuid = Uuid();
 
@@ -55,7 +56,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
 
   Future<void> _loadProject() async {
     final project =
-    await ref.read(projectRepositoryProvider).getProject(widget.projectId!);
+        await ref.read(projectRepositoryProvider).getProject(widget.projectId!);
     if (project == null || !mounted) return;
     setState(() {
       _existing = project;
@@ -97,7 +98,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
       genre: _genre,
       status: _status,
       synopsis:
-      _synopsisCtrl.text.trim().isEmpty ? null : _synopsisCtrl.text.trim(),
+          _synopsisCtrl.text.trim().isEmpty ? null : _synopsisCtrl.text.trim(),
       tags: _tags,
       wordCountGoal: int.tryParse(_wordGoalCtrl.text) ?? 0,
       wordCountCurrent: _existing?.wordCountCurrent ?? 0,
@@ -105,7 +106,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
       chapterCountDone: _existing?.chapterCountDone ?? 0,
       language: _language,
       notes:
-      _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
       deadline: _deadline,
       startedAt: _startedAt,
       createdAt: _existing?.createdAt ?? now,
@@ -165,7 +166,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
                 ),
                 textCapitalization: TextCapitalization.sentences,
                 validator: (v) =>
-                (v?.trim().isEmpty ?? true) ? 'Titel ist erforderlich' : null,
+                    (v?.trim().isEmpty ?? true) ? 'Titel ist erforderlich' : null,
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
@@ -182,7 +183,7 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
                 decoration: const InputDecoration(labelText: 'Status'),
                 items: ProjectStatus.values
                     .map((s) =>
-                    DropdownMenuItem(value: s, child: Text(s.label)))
+                        DropdownMenuItem(value: s, child: Text(s.label)))
                     .toList(),
                 onChanged: (v) => setState(() => _status = v!),
               ),
@@ -325,8 +326,8 @@ class _DeadlinePicker extends StatelessWidget {
   final VoidCallback onClear;
   const _DeadlinePicker(
       {required this.deadline,
-        required this.onChanged,
-        required this.onClear});
+      required this.onChanged,
+      required this.onClear});
 
   @override
   Widget build(BuildContext context) {
@@ -382,9 +383,9 @@ class _TagInput extends StatelessWidget {
   final ValueChanged<String> onRemove;
   const _TagInput(
       {required this.tags,
-        required this.controller,
-        required this.onAdd,
-        required this.onRemove});
+      required this.controller,
+      required this.onAdd,
+      required this.onRemove});
 
   @override
   Widget build(BuildContext context) {
@@ -430,12 +431,12 @@ class _TagInput extends StatelessWidget {
             runSpacing: 6,
             children: tags
                 .map((t) => Chip(
-              label: Text(t),
-              labelStyle: const TextStyle(fontSize: 12),
-              deleteIcon: const Icon(Icons.close_rounded, size: 14),
-              onDeleted: () => onRemove(t),
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-            ))
+                      label: Text(t),
+                      labelStyle: const TextStyle(fontSize: 12),
+                      deleteIcon: const Icon(Icons.close_rounded, size: 14),
+                      onDeleted: () => onRemove(t),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ))
                 .toList(),
           ),
         ],

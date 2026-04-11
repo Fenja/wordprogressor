@@ -1,10 +1,6 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 part 'app_database.g.dart';
 
@@ -85,8 +81,22 @@ class AppSettings extends Table {
 
 @DriftDatabase(tables: [Projects, Milestones, WritingSessions, AppSettings])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase() : super(driftDatabase(
+      name:'wordprogressor',
+    web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js')
+    ),
+    native: DriftNativeOptions(shareAcrossIsolates: true)
+  ));
 
+  /**
+   * return LazyDatabase(() async {
+      final dbFolder = await getApplicationDocumentsDirectory();
+      final file = File(p.join(dbFolder.path, '$dbName.sqlite'));
+      return NativeDatabase.createInBackground(file);
+      });
+   */
   @override
   int get schemaVersion => 1;
 
@@ -106,20 +116,20 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Project>> watchAllProjects() {
     return (select(projects)
-      ..orderBy([
+          ..orderBy([
             (p) => OrderingTerm(
-          expression: p.updatedAt,
-          mode: OrderingMode.desc,
-        ),
-      ]))
+                  expression: p.updatedAt,
+                  mode: OrderingMode.desc,
+                ),
+          ]))
         .watch();
   }
 
   Stream<List<Project>> watchActiveProjects() {
     return (select(projects)
-      ..where((p) =>
-          p.status.isIn(['active', 'draft', 'revision']))
-      ..orderBy([(p) => OrderingTerm(expression: p.updatedAt, mode: OrderingMode.desc)]))
+          ..where((p) =>
+              p.status.isIn(['active', 'draft', 'revision']))
+          ..orderBy([(p) => OrderingTerm(expression: p.updatedAt, mode: OrderingMode.desc)]))
         .watch();
   }
 
@@ -138,7 +148,7 @@ class AppDatabase extends _$AppDatabase {
 
   Future<List<Project>> getUnsyncedProjects() {
     return (select(projects)
-      ..where((p) => p.isSynced.equals(false)))
+          ..where((p) => p.isSynced.equals(false)))
         .get();
   }
 
@@ -151,18 +161,18 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<Milestone>> watchMilestonesForProject(String projectId) {
     return (select(milestones)
-      ..where((m) => m.projectId.equals(projectId))
-      ..orderBy([(m) => OrderingTerm(expression: m.sortOrder)]))
+          ..where((m) => m.projectId.equals(projectId))
+          ..orderBy([(m) => OrderingTerm(expression: m.sortOrder)]))
         .watch();
   }
 
   Stream<List<Milestone>> watchUpcomingMilestones() {
     final now = DateTime.now();
     return (select(milestones)
-      ..where((m) =>
-      m.isCompleted.equals(false) &
-      m.dueDate.isBiggerOrEqualValue(now))
-      ..orderBy([(m) => OrderingTerm(expression: m.dueDate)]))
+          ..where((m) =>
+              m.isCompleted.equals(false) &
+              m.dueDate.isBiggerOrEqualValue(now))
+          ..orderBy([(m) => OrderingTerm(expression: m.dueDate)]))
         .watch();
   }
 
@@ -189,17 +199,17 @@ class AppDatabase extends _$AppDatabase {
 
   Stream<List<WritingSession>> watchSessionsForProject(String projectId) {
     return (select(writingSessions)
-      ..where((s) => s.projectId.equals(projectId))
-      ..orderBy([(s) =>
-          OrderingTerm(expression: s.sessionDate, mode: OrderingMode.desc)]))
+          ..where((s) => s.projectId.equals(projectId))
+          ..orderBy([(s) =>
+              OrderingTerm(expression: s.sessionDate, mode: OrderingMode.desc)]))
         .watch();
   }
 
   Future<List<WritingSession>> getSessionsInRange(
       DateTime from, DateTime to) {
     return (select(writingSessions)
-      ..where((s) =>
-          s.sessionDate.isBetweenValues(from, to)))
+          ..where((s) =>
+              s.sessionDate.isBetweenValues(from, to)))
         .get();
   }
 
@@ -211,7 +221,7 @@ class AppDatabase extends _$AppDatabase {
 
   Future<String?> getSetting(String key) async {
     final row = await (select(appSettings)
-      ..where((s) => s.key.equals(key)))
+          ..where((s) => s.key.equals(key)))
         .getSingleOrNull();
     return row?.value;
   }
@@ -221,14 +231,6 @@ class AppDatabase extends _$AppDatabase {
       AppSettingsCompanion(key: Value(key), value: Value(value)),
     );
   }
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
-    final file = File(p.join(dbFolder.path, 'wordprogressor.sqlite'));
-    return NativeDatabase.createInBackground(file);
-  });
 }
 
 // Provider

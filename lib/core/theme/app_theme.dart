@@ -66,7 +66,7 @@ abstract class AppTheme {
           borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
         ),
         contentPadding:
-        const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       ),
 
       // Chips
@@ -115,7 +115,7 @@ abstract class AppTheme {
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
 

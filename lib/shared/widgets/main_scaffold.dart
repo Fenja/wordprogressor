@@ -7,10 +7,11 @@ class MainScaffold extends ConsumerWidget {
   const MainScaffold({super.key, required this.child});
 
   static const _tabs = [
-    (path: '/projects', label: 'Projekte', icon: Icons.folder_outlined, activeIcon: Icons.folder_rounded),
-    (path: '/deadlines', label: 'Deadlines', icon: Icons.event_outlined, activeIcon: Icons.event_rounded),
-    (path: '/stats', label: 'Statistiken', icon: Icons.bar_chart_outlined, activeIcon: Icons.bar_chart_rounded),
-    (path: '/settings', label: 'Einstellungen', icon: Icons.settings_outlined, activeIcon: Icons.settings_rounded),
+    (path: '/projects',     label: 'Projekte',      icon: Icons.folder_outlined,          activeIcon: Icons.folder_rounded),
+    (path: '/deadlines',    label: 'Deadlines',     icon: Icons.event_outlined,           activeIcon: Icons.event_rounded),
+    (path: '/achievements', label: 'Achievements',  icon: Icons.emoji_events_outlined,    activeIcon: Icons.emoji_events_rounded),
+    (path: '/stats',        label: 'Statistiken',   icon: Icons.bar_chart_outlined,       activeIcon: Icons.bar_chart_rounded),
+    (path: '/settings',     label: 'Einstellungen', icon: Icons.settings_outlined,        activeIcon: Icons.settings_rounded),
   ];
 
   int _tabIndex(BuildContext context) {

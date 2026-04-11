@@ -15,9 +15,6 @@ FlutterLocalNotificationsPlugin();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // localization
-  //await initializeDateFormatting('de_DE', '');
-
   // Lock to portrait on phones, allow landscape on tablets
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

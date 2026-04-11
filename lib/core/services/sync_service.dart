@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/projects/data/project_repository.dart';
+import '../../features/projects/domain/project_model.dart';
 import '../database/app_database.dart';
 import 'package:drift/drift.dart' show Value;
 
@@ -106,7 +107,7 @@ class SyncService {
       'language': row.language,
       'notes': row.notes,
       'deadline':
-      row.deadline != null ? Timestamp.fromDate(row.deadline!) : null,
+          row.deadline != null ? Timestamp.fromDate(row.deadline!) : null,
       'startedAt': Timestamp.fromDate(row.startedAt),
       'createdAt': Timestamp.fromDate(row.createdAt),
       'updatedAt': Timestamp.fromDate(row.updatedAt),
