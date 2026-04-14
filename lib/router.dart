@@ -1,24 +1,35 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:wordprogressor/features/achievements/presentation/achievements_screen.dart';
 
-import '../features/deadlines/presentation/deadlines_screen.dart';
-import '../features/milestones/presentation/milestones_screen.dart';
+import '../features/projects/presentation/project_list_screen.dart';
 import '../features/projects/presentation/project_detail_screen.dart';
 import '../features/projects/presentation/project_form_screen.dart';
-import '../features/projects/presentation/project_list_screen.dart';
-import '../features/settings/presentation/settings_screen.dart';
+import '../features/milestones/presentation/milestones_screen.dart';
+import '../features/deadlines/presentation/deadlines_screen.dart';
 import '../features/stats/presentation/stats_screen.dart';
+import '../features/settings/presentation/settings_screen.dart';
+import '../features/settings/presentation/auth_screen.dart';
+import '../features/achievements/presentation/achievements_screen.dart';
 import '../shared/widgets/main_scaffold.dart';
+import '../shared/widgets/error_screen.dart';
 
 part 'router.g.dart';
 
 @riverpod
 GoRouter router(RouterRef ref) {
   return GoRouter(
-    initialLocation: '/projects',
+    initialLocation: '/',
     debugLogDiagnostics: false,
+    errorBuilder: (context, state) => ErrorScreen(error: state.error),
     routes: [
+      // Home route — redirects immediately to /projects
+      GoRoute(
+        path: '/',
+        redirect: (_, __) => '/projects',
+      ),
+
+      // Main shell — all routes here share the bottom / sidebar navigation
       ShellRoute(
         builder: (context, state, child) => MainScaffold(child: child),
         routes: [
@@ -35,8 +46,8 @@ GoRouter router(RouterRef ref) {
               ),
               GoRoute(
                 path: ':id',
-                builder: (context, state) =>
-                    ProjectDetailScreen(projectId: state.pathParameters['id']!),
+                builder: (context, state) => ProjectDetailScreen(
+                    projectId: state.pathParameters['id']!),
                 routes: [
                   GoRoute(
                     path: 'edit',
@@ -59,6 +70,12 @@ GoRouter router(RouterRef ref) {
             ),
           ),
           GoRoute(
+            path: '/achievements',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: AchievementsScreen(),
+            ),
+          ),
+          GoRoute(
             path: '/stats',
             pageBuilder: (context, state) => const NoTransitionPage(
               child: StatsScreen(),
@@ -70,13 +87,13 @@ GoRouter router(RouterRef ref) {
               child: SettingsScreen(),
             ),
           ),
-          GoRoute(
-            path: '/achievements',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: AchievementsScreen(),
-            ),
-          ),
         ],
+      ),
+
+      // Auth screen — no bottom / sidebar navigation
+      GoRoute(
+        path: '/auth',
+        builder: (context, state) => const AuthScreen(),
       ),
     ],
   );
