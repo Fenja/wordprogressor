@@ -8,6 +8,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'app/app.dart';
 import 'core/database/app_database.dart';
 import 'core/services/notification_service.dart';
+import 'firebase_options.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
@@ -40,9 +41,11 @@ void main() async {
 
   // Try Firebase init (graceful fail if not configured)
   try {
-    await Firebase.initializeApp();
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   } catch (_) {
-    // Firebase not configured — offline-only mode
+    // Offline-only mode wenn Firebase nicht erreichbar
   }
 
   // Initialize local database

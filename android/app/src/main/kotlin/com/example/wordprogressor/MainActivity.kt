@@ -1,4 +1,4 @@
-package com.example.wordprogressor
+package com.erdbeerbeet.wordprogressor
 
 import io.flutter.embedding.android.FlutterActivity
 

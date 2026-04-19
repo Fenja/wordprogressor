@@ -3,7 +3,7 @@ plugins {
     id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
     // Firebase (uncomment after running flutterfire configure)
-    // id "com.google.gms.google-services"
+    id "com.google.gms.google-services"
 }
 
 def localProperties = new Properties()
@@ -25,7 +25,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace "com.example.wordprogressor"
+    namespace "com.erdbeerbeet.wordprogressor"
     compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
@@ -43,7 +43,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.wordprogressor"
+        applicationId "com.erdbeerbeet.wordprogressor"
         // Set minimum to 23 for Firebase Auth compatibility
         minSdkVersion 23
         targetSdkVersion flutter.targetSdkVersion

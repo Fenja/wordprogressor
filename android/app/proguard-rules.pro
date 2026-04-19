@@ -7,7 +7,7 @@
 -keep class io.flutter.plugins.**  { *; }
 
 # Drift / sqlite
--keep class com.example.wordprogressor.** { *; }
+-keep class com.erdbeerbeet.wordprogressor.** { *; }
 
 # Firebase
 -keepattributes Signature
