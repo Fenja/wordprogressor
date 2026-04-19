@@ -27,6 +27,11 @@ dependencies:
   firebase_auth: ^5.1.4
   cloud_firestore: ^5.2.1
 
+  # Social Sign-In
+  google_sign_in: ^6.2.1
+  sign_in_with_apple: ^6.1.1
+  crypto: ^3.0.3              # for Apple nonce hashing
+
   # Navigation
   go_router: ^14.2.0
 

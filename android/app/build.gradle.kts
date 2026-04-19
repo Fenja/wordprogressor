@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.erdbeerbeet.wordprogressor"
+    namespace = "de.erdbeerbeet.wordprogressor"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.erdbeerbeet.wordprogressor"
+        applicationId = "de.erdbeerbeet.wordprogressor"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
