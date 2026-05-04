@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../domain/project_model.dart';
 import '../providers/project_providers.dart';
-import '../presentation/widgets/deadline_badge.dart';
-import '../presentation/widgets/project_progress_bar.dart';
-import '../presentation/project_search_delegate.dart';
+import 'widgets/deadline_badge.dart';
+import 'widgets/project_progress_bar.dart';
+import '../../../shared/widgets/cover_image.dart';
+import 'project_search_delegate.dart';
 import '../../achievements/providers/achievement_providers.dart';
+import '../../../shared/widgets/user_status_badge.dart';
 
 class ProjectListScreen extends ConsumerWidget {
   const ProjectListScreen({super.key});
@@ -22,6 +24,8 @@ class ProjectListScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('WordProgressor'),
         actions: [
+          // User status — compact avatar/sign-in button
+          const UserStatusBadge(compact: true),
           // Streak badge
           streakAsync.when(
             loading: () => const SizedBox.shrink(),
@@ -116,14 +120,17 @@ class _FilterChips extends ConsumerWidget {
   }
 }
 
-class _ProjectCard extends ConsumerWidget {
+// ── Project card ──────────────────────────────────────────────────────────────
+
+class _ProjectCard extends StatelessWidget {
   final ProjectModel project;
   const _ProjectCard({required this.project});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final genreIcon = kGenreIcons[project.genre] ?? '📝';
+    final hasCover =
+        project.coverLocalPath != null || project.coverRemoteUrl != null;
 
     return Semantics(
       label:
@@ -134,62 +141,85 @@ class _ProjectCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(14),
           onTap: () => context.push('/projects/${project.id}'),
           child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
+            padding: const EdgeInsets.all(12),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Text(genreIcon, style: const TextStyle(fontSize: 16)),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        project.title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                // ── Cover image ───────────────────────────────────────────
+                CoverImage(
+                  localPath: project.coverLocalPath,
+                  remoteUrl: project.coverRemoteUrl,
+                  width: 56,
+                  height: 78,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                const SizedBox(width: 12),
+
+                // ── Content ───────────────────────────────────────────────
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Title + status badge
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              project.title,
+                              style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.w600),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          _StatusBadge(status: project.status),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    _StatusBadge(status: project.status),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${project.genre} · ${_formatWordCount(project.wordCountCurrent)} Wörter',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                ProjectProgressBar(
-                  value: project.progressPercent,
-                  height: 5,
-                  semanticLabel:
-                      '${(project.progressPercent * 100).round()}% fertig',
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Text(
-                      '${(project.progressPercent * 100).round()}%',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    if (project.chapterCountTotal > 0) ...[
+                      const SizedBox(height: 3),
+
+                      // Genre + word count
                       Text(
-                        ' · Kap. ${project.chapterCountDone}/${project.chapterCountTotal}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                        '${project.genre} · '
+                        '${_formatWordCount(project.wordCountCurrent)} Wörter',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Progress bar
+                      ProjectProgressBar(
+                        value: project.progressPercent,
+                        height: 4,
+                        semanticLabel:
+                            '${(project.progressPercent * 100).round()}% fertig',
+                      ),
+                      const SizedBox(height: 5),
+
+                      // Stats row
+                      Row(
+                        children: [
+                          Text(
+                            '${(project.progressPercent * 100).round()}%',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant),
+                          ),
+                          if (project.chapterCountTotal > 0) ...[
+                            Text(
+                              ' · Kap. ${project.chapterCountDone}/'
+                              '${project.chapterCountTotal}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                  color:
+                                      theme.colorScheme.onSurfaceVariant),
+                            ),
+                          ],
+                          const Spacer(),
+                          DeadlineBadge(project: project),
+                        ],
                       ),
                     ],
-                    const Spacer(),
-                    DeadlineBadge(project: project),
-                  ],
+                  ),
                 ),
               ],
             ),
@@ -261,7 +291,7 @@ class _EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('✍️', style: const TextStyle(fontSize: 56)),
+            const Text('✍️', style: TextStyle(fontSize: 56)),
             const SizedBox(height: 16),
             Text(
               filter == ProjectFilter.all

@@ -35,12 +35,11 @@ class ProjectRepository {
 
   Future<ProjectModel?> getProject(String id) async {
     final row = await _db.getProject(id);
-    if (row == null) return null;
-    return _rowToModel(row);
+    return row == null ? null : _rowToModel(row);
   }
 
   Future<String> createProject(ProjectModel model) async {
-    final id = _uuid.v4();
+    final id  = model.id.isNotEmpty ? model.id : _uuid.v4();
     final now = DateTime.now();
     await _db.upsertProject(
       ProjectsCompanion.insert(
@@ -62,6 +61,8 @@ class ProjectRepository {
         createdAt: now,
         updatedAt: now,
         colorHex: Value(model.colorHex),
+        coverLocalPath: Value(model.coverLocalPath),
+        coverRemoteUrl: Value(model.coverRemoteUrl),
       ),
     );
     return id;
@@ -89,6 +90,8 @@ class ProjectRepository {
         updatedAt: Value(DateTime.now()),
         isSynced: const Value(false),
         colorHex: Value(model.colorHex),
+        coverLocalPath: Value(model.coverLocalPath),
+        coverRemoteUrl: Value(model.coverRemoteUrl),
       ),
     );
 
@@ -156,17 +159,22 @@ class ProjectRepository {
       allSessions.map((s) => s.sessionDate).toList(),
     );
 
-    final achievementService = AchievementService(_db);
-    final newlyUnlocked = await achievementService.evaluateAfterSession(
+    return AchievementService(_db).evaluateAfterSession(
       totalWordsAllProjects: totalWords,
       currentStreakDays: streakDays,
       sessionWords: wordsWritten,
       sessionDurationMinutes: durationMinutes,
       sessionTime: now,
     );
-
-    return newlyUnlocked;
   }
+
+  // ── Sync helpers ──────────────────────────────────────────────────────────
+
+  Future<List<Project>> getUnsyncedProjects() =>
+      _db.getUnsyncedProjects();
+
+  Future<void> markProjectSynced(String id) =>
+      _db.markProjectSynced(id);
 
   // ── Conversion ────────────────────────────────────────────────────────────
 
@@ -195,6 +203,8 @@ class ProjectRepository {
       isSynced: row.isSynced,
       remoteId: row.remoteId,
       colorHex: row.colorHex,
+      coverLocalPath: row.coverLocalPath,
+      coverRemoteUrl: row.coverRemoteUrl,
     );
   }
 }

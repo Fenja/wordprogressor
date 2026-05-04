@@ -57,11 +57,16 @@ class SyncService {
 
   Future<void> _pushProjects() async {
     final unsynced = await _db.getUnsyncedProjects();
+    if (unsynced.isEmpty) return;
+
     final batch = _firestore.batch();
 
     for (final row in unsynced) {
-      final docRef = _projectsRef.doc(row.id);
-      batch.set(docRef, _projectToFirestore(row), SetOptions(merge: true));
+      batch.set(
+        _projectsRef.doc(row.id),
+        _rowToFirestore(row),
+        SetOptions(merge: true),
+      );
     }
 
     await batch.commit();
@@ -83,16 +88,16 @@ class SyncService {
 
       final local = await _db.getProject(doc.id);
 
-      // Skip if local is newer
+      // Skip if local copy is newer
       if (local != null && local.updatedAt.isAfter(remoteUpdatedAt)) continue;
 
-      await _db.upsertProject(_firestoreToCompanion(doc.id, data));
+      await _db.upsertProject(_firestoreToCompanion(doc.id, data, local));
     }
   }
 
   // ── Serialization ─────────────────────────────────────────────────────────
 
-  static Map<String, dynamic> _projectToFirestore(Project row) {
+  static Map<String, dynamic> _rowToFirestore(Project row) {
     return {
       'title': row.title,
       'genre': row.genre,
@@ -112,15 +117,18 @@ class SyncService {
       'createdAt': Timestamp.fromDate(row.createdAt),
       'updatedAt': Timestamp.fromDate(row.updatedAt),
       'colorHex': row.colorHex,
+      'coverRemoteUrl': row.coverRemoteUrl,
     };
   }
 
   static ProjectsCompanion _firestoreToCompanion(
-      String id, Map<String, dynamic> data) {
+    String id,
+    Map<String, dynamic> data,
+    Project? existingLocal,
+  ) {
     DateTime? parseTs(String key) {
       final ts = data[key];
-      if (ts is Timestamp) return ts.toDate();
-      return null;
+      return ts is Timestamp ? ts.toDate() : null;
     }
 
     return ProjectsCompanion(
@@ -144,6 +152,8 @@ class SyncService {
       isSynced: const Value(true),
       remoteId: Value(id),
       colorHex: Value(data['colorHex'] as String?),
+      coverRemoteUrl: Value(data['coverRemoteUrl'] as String?),
+      coverLocalPath:   Value(existingLocal?.coverLocalPath),
     );
   }
 }

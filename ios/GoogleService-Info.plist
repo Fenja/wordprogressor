@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>563588729440-6jp4l25k4g4edl7hcue19k3trvm9te88.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.563588729440-6jp4l25k4g4edl7hcue19k3trvm9te88</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>563588729440-ad5q0p0iklgmj4csne5bc6pfbhho0c1k.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB_Xizf3uRO-5hBBz2YtCGBZjvnFA3Ek7M</string>
+	<key>GCM_SENDER_ID</key>
+	<string>563588729440</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>de.erdbeerbeet.wordprogressor</string>
+	<key>PROJECT_ID</key>
+	<string>wordprogressor</string>
+	<key>STORAGE_BUCKET</key>
+	<string>wordprogressor.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:563588729440:ios:40fb0fbe8cecf331919105</string>
+	<key>DATABASE_URL</key>
+	<string>https://wordprogressor-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

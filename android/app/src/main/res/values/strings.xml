@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+        Google Sign-In: Web Client ID aus der Firebase Console.
+        Pfad: Firebase Console → Authentication → Sign-in method
+              → Google → Web SDK-Konfiguration → Web-Client-ID
+
+        WICHTIG: Dieser Wert muss mit der google-services.json übereinstimmen.
+        Ersetze den Platzhalter mit deiner echten Client-ID.
+    -->
+    <string name="default_web_client_id">563588729440-ad5q0p0iklgmj4csne5bc6pfbhho0c1k.apps.googleusercontent.com</string>
+</resources>

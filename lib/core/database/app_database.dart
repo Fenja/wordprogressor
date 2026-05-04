@@ -30,6 +30,8 @@ class Projects extends Table {
   TextColumn get remoteId => text().nullable()();
   // Color accent for card (hex string)
   TextColumn get colorHex => text().nullable()();
+  TextColumn get coverLocalPath => text().nullable()();   // lokaler Dateipfad
+  TextColumn get coverRemoteUrl => text().nullable()();   // Firebase Storage URL
 
   @override
   Set<Column> get primaryKey => {id};
@@ -98,7 +100,7 @@ class AppDatabase extends _$AppDatabase {
       });
    */
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
@@ -107,7 +109,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createAll();
       },
       onUpgrade: (m, from, to) async {
-        // Future migrations go here
+        if (from < 2) {
+          // Neue Spalten zu bestehender Tabelle hinzufügen
+          await m.addColumn(projects, projects.coverLocalPath);
+          await m.addColumn(projects, projects.coverRemoteUrl);
+        }
       },
     );
   }

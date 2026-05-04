@@ -55,6 +55,8 @@ class ProjectModel with _$ProjectModel {
     @Default(false) bool isSynced,
     String? remoteId,
     String? colorHex,
+    String? coverLocalPath,
+    String? coverRemoteUrl,
   }) = _ProjectModel;
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) =>
@@ -86,6 +88,7 @@ class ProjectModel with _$ProjectModel {
   }
 
   int get wordsRemaining => (wordCountGoal - wordCountCurrent).clamp(0, wordCountGoal);
+  bool get hasCover => coverLocalPath != null || coverRemoteUrl != null;
 
   /// Returns tags from JSON string stored in DB
   static List<String> tagsFromJson(String json) {

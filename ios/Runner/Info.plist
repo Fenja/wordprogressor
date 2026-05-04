@@ -67,5 +67,10 @@
             </array>
         </dict>
     </array>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>WordProgressor benötigt Zugriff auf deine Fotobibliothek, um ein Coverbild für dein Projekt auszuwählen.</string>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>WordProgressor möchte Fotos in deiner Bibliothek speichern.</string>
 </dict>
 </plist>

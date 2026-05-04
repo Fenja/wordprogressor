@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -8,6 +10,7 @@ import 'package:intl/intl.dart';
 import '../domain/project_model.dart';
 import '../data/project_repository.dart';
 import '../providers/project_providers.dart';
+import 'widgets/cover_image_picker.dart';
 
 const _uuid = Uuid();
 
@@ -27,9 +30,9 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
   late TextEditingController _synopsisCtrl;
   late TextEditingController _notesCtrl;
   late TextEditingController _wordGoalCtrl;
-  late TextEditingController _wordCurrentCtrl;   // ← new
+  late TextEditingController _wordCurrentCtrl;
   late TextEditingController _chapterTotalCtrl;
-  late TextEditingController _chapterDoneCtrl;   // ← new
+  late TextEditingController _chapterDoneCtrl;
   late TextEditingController _tagInputCtrl;
 
   // State
@@ -43,7 +46,13 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
   bool _isLoadingProject = false;
   ProjectModel? _existing;
 
+  // Cover image
+  String? _coverLocalPath;
+  String? _coverRemoteUrl;
+  Uint8List? _coverBytes;
+
   bool get _isEdit => widget.projectId != null;
+  late final String _projectId = widget.projectId ?? _uuid.v4();
 
   @override
   void initState() {
@@ -83,6 +92,8 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
       _startedAt           = project.startedAt;
       _deadline            = project.deadline;
       _tags                = List.from(project.tags);
+      _coverLocalPath        = project.coverLocalPath;
+      _coverRemoteUrl        = project.coverRemoteUrl;
       _isLoadingProject    = false;
     });
   }
@@ -119,11 +130,10 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
       title:            _titleCtrl.text.trim(),
       genre:            _genre,
       status:           _status,
-      synopsis:         _synopsisCtrl.text.trim().isEmpty
-          ? null : _synopsisCtrl.text.trim(),
+      synopsis:         _synopsisCtrl.text.trim().isEmpty ? null : _synopsisCtrl.text.trim(),
       tags:             _tags,
-      wordCountGoal:    wordGoal,
-      wordCountCurrent: wordCurrent,
+      wordCountGoal:    int.tryParse(_wordGoalCtrl.text) ?? 0,
+      wordCountCurrent: int.tryParse(_wordCurrentCtrl.text) ?? 0,
       chapterCountTotal: chapTotal,
       chapterCountDone:  chapDone.clamp(0, chapTotal > 0 ? chapTotal : chapDone),
       language:         _language,
@@ -133,9 +143,12 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
       startedAt:        _startedAt,
       createdAt:        _existing?.createdAt ?? now,
       updatedAt:        now,
+      coverLocalPath:   _coverLocalPath,
+      coverRemoteUrl:   _coverRemoteUrl,
     );
 
     try {
+      final repo = ref.read(projectRepositoryProvider);
       if (_isEdit) {
         await repo.updateProject(model);
       } else {
@@ -191,35 +204,40 @@ class _ProjectFormScreenState extends ConsumerState<ProjectFormScreen> {
           children: [
             // ── Grunddaten ────────────────────────────────────────────────
             _Section(label: 'Grunddaten', children: [
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Titel *',
-                  hintText: 'z.B. Das Schweigen des Mondes',
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                CoverImagePicker(
+                  projectId: _projectId,
+                  initialBytes: _coverBytes,
+                  initialLocalPath: _coverLocalPath,
+                  initialRemoteUrl: _coverRemoteUrl,
+                  onLocalPathChanged: (p) => setState(() => _coverLocalPath = p),
+                  onBytesChanged:    (b) => setState(() => _coverBytes = b),
+                  onRemoteUrlChanged:(u) => setState(() => _coverRemoteUrl = u),
                 ),
-                textCapitalization: TextCapitalization.sentences,
-                validator: (v) => (v?.trim().isEmpty ?? true)
-                    ? 'Titel ist erforderlich' : null,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                value: _genre,
-                decoration: const InputDecoration(labelText: 'Genre'),
-                items: kGenres
-                    .map((g) => DropdownMenuItem(value: g, child: Text(g)))
-                    .toList(),
-                onChanged: (v) => setState(() => _genre = v!),
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<ProjectStatus>(
-                value: _status,
-                decoration: const InputDecoration(labelText: 'Status'),
-                items: ProjectStatus.values
-                    .map((s) =>
-                    DropdownMenuItem(value: s, child: Text(s.label)))
-                    .toList(),
-                onChanged: (v) => setState(() => _status = v!),
-              ),
+                const SizedBox(width: 16),
+                Expanded(child: Column(children: [
+                  TextFormField(
+                    controller: _titleCtrl,
+                    decoration: const InputDecoration(labelText: 'Titel *', hintText: 'z.B. Das Schweigen des Mondes'),
+                    textCapitalization: TextCapitalization.sentences,
+                    validator: (v) => (v?.trim().isEmpty ?? true) ? 'Titel ist erforderlich' : null,
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: _genre,
+                    decoration: const InputDecoration(labelText: 'Genre'),
+                    items: kGenres.map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
+                    onChanged: (v) => setState(() => _genre = v!),
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<ProjectStatus>(
+                    value: _status,
+                    decoration: const InputDecoration(labelText: 'Status'),
+                    items: ProjectStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label))).toList(),
+                    onChanged: (v) => setState(() => _status = v!),
+                  ),
+                ])),
+              ]),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _synopsisCtrl,

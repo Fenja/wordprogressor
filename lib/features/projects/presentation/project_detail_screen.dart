@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:wordprogressor/shared/widgets/cover_image.dart';
 
 import '../domain/project_model.dart';
 import '../providers/project_providers.dart';
@@ -46,7 +47,6 @@ class _ProjectDetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
     final fmt = DateFormat('dd. MMMM yyyy', 'de');
 
     return Scaffold(
@@ -74,8 +74,30 @@ class _ProjectDetailView extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Progress hero
-            _ProgressHero(project: project),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(14),
+                    child: CoverImage(
+                    localPath: project.coverLocalPath,
+                    remoteUrl: project.coverRemoteUrl,
+                    width: 120,
+                    height: 168,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                // Progress hero
+                Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                         _ProgressHero(project: project),
+                        ]
+                    ),
+                ),
+              ],
+            ),
 
             const Divider(),
 
